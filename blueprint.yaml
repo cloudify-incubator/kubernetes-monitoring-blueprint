@@ -62,9 +62,24 @@ node_templates:
     relationships:
     - type: cloudify.kubernetes.relationships.managed_by_master
       target: kube
+    interfaces: &host_agent_ops
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_create
+          executor: host_agent
+        update:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_update
+          executor: host_agent
+        delete:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_delete
+          executor: host_agent
+        start:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_read
+          executor: host_agent
 
   influx_service:
     type: cloudify.kubernetes.resources.Service
+    interfaces: *host_agent_ops
     properties:
       options:
         namespace: kube-system
@@ -97,6 +112,7 @@ node_templates:
 
   grafana_deployment:
     type: cloudify.kubernetes.resources.Deployment
+    interfaces: *host_agent_ops
     properties:
       options:
         namespace: kube-system
@@ -159,6 +175,7 @@ node_templates:
 
   grafana_service:
     type: cloudify.kubernetes.resources.Service
+    interfaces: *host_agent_ops
     properties:
       options:
         namespace: kube-system
@@ -222,9 +239,18 @@ node_templates:
     relationships:
     - type: cloudify.kubernetes.relationships.managed_by_master
       target: kube
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: kubernetes.cloudify_kubernetes.tasks.custom_resource_create
+          executor: host_agent
+        delete:
+          implementation: kubernetes.cloudify_kubernetes.tasks.custom_resource_delete
+          executor: host_agent
 
   heapster_deployment:
     type: cloudify.kubernetes.resources.Deployment
+    interfaces: *host_agent_ops
     properties:
       options:
         namespace: kube-system
@@ -261,6 +287,7 @@ node_templates:
 
   heapster_service:
     type: cloudify.kubernetes.resources.Service
+    interfaces: *host_agent_ops
     properties:
       options:
         namespace: kube-system
