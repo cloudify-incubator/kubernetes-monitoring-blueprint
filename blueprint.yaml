@@ -312,3 +312,7 @@ node_templates:
       target: kube
     - type: cloudify.relationships.depends_on
       target: heapster_service
+
+outputs:
+  placeholder:
+    value: ''
